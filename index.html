@@ -1,391 +1,59 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Villa Dar Abdou — War Room</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f4f0;color:#1a1a18;min-height:100vh;}
-header{background:#1a1a18;color:#f5f4f0;padding:1.25rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
-header h1{font-size:16px;font-weight:500;}
-header p{font-size:11px;color:#888780;margin-top:2px;}
-.sync-bar{display:flex;align-items:center;gap:8px;font-size:11px;padding:7px 1.5rem;background:#eeede8;border-bottom:0.5px solid #d3d1c7;}
-.dot{width:7px;height:7px;border-radius:50%;background:#639922;flex-shrink:0;transition:background 0.3s;}
-.dot.syncing{background:#EF9F27;}
-.dot.err{background:#E24B4A;}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;padding:1rem 1.5rem;}
-.stat{background:#fff;border-radius:8px;border:0.5px solid #d3d1c7;padding:10px 14px;}
-.stat-label{font-size:10px;color:#5f5e5a;font-weight:500;text-transform:uppercase;letter-spacing:0.04em;}
-.stat-value{font-size:20px;font-weight:500;margin-top:3px;color:#1a1a18;}
-.stat-sub{font-size:10px;color:#888780;margin-top:1px;}
-.prog-wrap{padding:0 1.5rem 0.75rem;}
-.prog-track{height:6px;background:#d3d1c7;border-radius:99px;overflow:hidden;display:flex;}
-.prog-seg{height:100%;transition:width 0.4s;}
-.prog-labels{display:flex;gap:12px;margin-top:5px;flex-wrap:wrap;}
-.prog-leg{display:flex;align-items:center;gap:4px;font-size:10px;color:#5f5e5a;}
-.prog-leg-dot{width:7px;height:7px;border-radius:50%;}
-.phase{margin:0 1.5rem 1.5rem;}
-.phase-hd{display:flex;align-items:center;gap:8px;margin-bottom:10px;padding-bottom:8px;border-bottom:0.5px solid #d3d1c7;flex-wrap:wrap;}
-.badge{font-size:10px;font-weight:500;padding:2px 9px;border-radius:99px;text-transform:uppercase;letter-spacing:0.04em;}
-.b-red{background:#FCEBEB;color:#A32D2D;}
-.b-amber{background:#FAEEDA;color:#854F0B;}
-.b-green{background:#EAF3DE;color:#3B6D11;}
-.phase-title{font-size:14px;font-weight:500;color:#1a1a18;}
-.phase-dates{font-size:11px;color:#888780;margin-left:auto;}
-.note{margin-bottom:10px;background:#FAEEDA;border-left:3px solid #EF9F27;border-radius:0 7px 7px 0;padding:8px 12px;font-size:11px;color:#633806;line-height:1.5;}
-.tasks{display:flex;flex-direction:column;gap:7px;}
-.task{background:#fff;border-radius:9px;border:0.5px solid #d3d1c7;padding:12px 14px;display:grid;grid-template-columns:1fr auto;gap:10px;transition:border-color 0.15s,opacity 0.2s;}
-.task:hover{border-color:#888780;}
-.task.st-done{opacity:0.5;}
-.task.st-done .task-title{text-decoration:line-through;}
-.task.st-blocked{border-left:3px solid #E24B4A;border-radius:0 9px 9px 0;}
-.task.st-inprogress{border-left:3px solid #EF9F27;border-radius:0 9px 9px 0;}
-.task-body{min-width:0;}
-.task-top{display:flex;align-items:flex-start;gap:6px;flex-wrap:wrap;margin-bottom:3px;}
-.task-title{font-size:13px;font-weight:500;color:#1a1a18;line-height:1.4;}
-.task-why{font-size:11px;color:#5f5e5a;line-height:1.5;margin-bottom:7px;}
-.task-footer{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
-.imp{display:flex;align-items:center;gap:5px;flex:1;min-width:110px;}
-.imp-label{font-size:10px;color:#888780;width:36px;flex-shrink:0;}
-.bar-t{flex:1;height:4px;background:#d3d1c7;border-radius:99px;max-width:110px;}
-.bar-f{height:100%;border-radius:99px;}
-.imp-pct{font-size:10px;font-weight:500;width:26px;}
-.ih .bar-f{background:#E24B4A;} .ih .imp-pct{color:#A32D2D;}
-.im .bar-f{background:#EF9F27;} .im .imp-pct{color:#854F0B;}
-.il .bar-f{background:#97C459;} .il .imp-pct{color:#3B6D11;}
-.imin .bar-f{background:#b4b2a9;} .imin .imp-pct{color:#5f5e5a;}
-.meta-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
-.deadline{font-size:10px;color:#888780;white-space:nowrap;}
-.deadline strong{color:#1a1a18;}
-.budget{font-size:10px;font-weight:500;white-space:nowrap;color:#1a1a18;}
-.bz{color:#888780;}
-.tag{display:inline-block;font-size:10px;font-weight:500;padding:1px 7px;border-radius:99px;}
-.tc{background:#E6F1FB;color:#0C447C;}
-.tu{background:#FCEBEB;color:#A32D2D;}
-.tm{background:#EAF3DE;color:#3B6D11;}
-.resp-wrap{display:flex;align-items:center;gap:5px;margin-top:6px;flex-wrap:wrap;}
-.resp-input{font-size:11px;border:0.5px solid #d3d1c7;border-radius:5px;padding:3px 8px;background:#f5f4f0;color:#1a1a18;outline:none;transition:border-color 0.15s;width:130px;}
-.resp-input:focus{border-color:#888780;background:#fff;}
-.resp-input::placeholder{color:#b4b2a9;}
-.save-btn{font-size:10px;padding:3px 8px;cursor:pointer;border-radius:5px;border:0.5px solid #888780;background:transparent;color:#5f5e5a;}
-.save-btn:hover{background:#f5f4f0;}
-.resp-display{font-size:11px;font-weight:500;color:#185FA5;background:#E6F1FB;padding:2px 8px;border-radius:5px;}
-.edit-btn{font-size:10px;padding:2px 6px;cursor:pointer;border-radius:4px;border:0.5px solid #d3d1c7;background:transparent;color:#888780;margin-left:3px;}
-.edit-btn:hover{background:#f5f4f0;}
-.task-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px;min-width:96px;}
-.status-btn{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:7px;border:0.5px solid #888780;background:#f5f4f0;cursor:pointer;font-size:11px;font-weight:500;transition:all 0.15s;white-space:nowrap;user-select:none;color:#1a1a18;}
-.status-btn:hover{border-color:#1a1a18;}
-.status-btn:active{transform:scale(0.97);}
-.status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
-.sd-todo{background:#b4b2a9;}
-.sd-inprogress{background:#EF9F27;}
-.sd-blocked{background:#E24B4A;}
-.sd-done{background:#639922;}
-.status-hint{font-size:9px;color:#b4b2a9;text-align:right;margin-top:-4px;}
-.legend{display:flex;flex-wrap:wrap;gap:10px;padding:0 1.5rem 1rem;align-items:center;font-size:11px;color:#5f5e5a;}
-.ld{display:flex;align-items:center;gap:4px;}
-.ldot{width:7px;height:7px;border-radius:50%;}
-.footer-note{margin:0 1.5rem 1.5rem;background:#fff;border-radius:9px;border:0.5px solid #d3d1c7;padding:14px 16px;font-size:11px;color:#5f5e5a;line-height:1.7;}
-.footer-note strong{color:#1a1a18;}
-.intro{margin:1rem 1.5rem;background:#fff;border-radius:9px;border:0.5px solid #d3d1c7;padding:16px 20px;font-size:12px;color:#1a1a18;line-height:1.8;}
-.intro h2{font-size:14px;font-weight:500;margin-bottom:8px;color:#1a1a18;}
-.intro p{color:#5f5e5a;margin-bottom:6px;}
-.intro p:last-child{margin-bottom:0;}
-.intro strong{color:#1a1a18;}
-</style>
-</head>
-<body>
+Villa Dar Abdou — War Room
+Plan de lancement juin–août 2026 · Budget 1 000 €
+Avancement global
+—
 
-<header>
-  <div>
-    <h1>Villa Dar Abdou — War Room</h1>
-    <p>Plan de lancement juin–août 2026 · Budget 1 000 €</p>
-  </div>
-  <div style="text-align:right;">
-    <div style="font-size:10px;color:#888780;">Avancement global</div>
-    <div id="global-pct" style="font-size:20px;font-weight:500;color:#f5f4f0;">—</div>
-  </div>
-</header>
+Connexion à la base de données…
 
-<div class="sync-bar">
-  <div class="dot syncing" id="sync-dot"></div>
-  <span id="sync-label">Connexion à la base de données…</span>
-  <span style="margin-left:auto;color:#888780;font-size:10px;" id="last-sync"></span>
-</div>
+Équipe Villa Dar Abdou,
+Vous avez devant vous une war room.
+Une war room, c'est l'outil qu'utilisent les équipes militaires, les salles de crise et les startups en phase de lancement pour une seule raison : quand le temps manque et que chaque action compte, il faut que tout le monde voie exactement où on en est, qui fait quoi, et ce qui bloque.
+On est dans cette situation. Zéro réservation. Juin dans 8 jours. Un produit excellent qui n'existe pas encore aux yeux des clients.
+Cette war room, c'est notre tableau de bord commun pour les 45 prochains jours. Chaque tâche a un impact chiffré — ce n'est pas décoratif. Une barre rouge à 90% signifie que cette action génère directement des réservations. Une barre grise à 15% signifie que c'est utile, mais pas maintenant.
+Voici comment ça fonctionne :
+	•	Choisissez une tâche libre et tapez votre prénom dans le champ "Attribuer à…" puis cliquez OK — elle vous appartient, tout le monde le voit.
+	•	Cliquez sur le bouton de statut à droite de chaque tâche pour faire avancer : À faire → En cours → Bloquée → Terminée. L'avancement global se met à jour en temps réel pour toute l'équipe.
+	•	Lisez le "pourquoi" sous chaque tâche avant de commencer — pas pour faire joli, mais parce que comprendre l'objectif change la façon de l'exécuter.
+Une seule règle : les tâches marquées Urgent passent avant tout le reste. Sans elles, le reste ne sert à rien.
+On a 8 jours pour exister. Allons-y.
+RÉSERVATIONS
+0
+Juin–août 2026
+AVIS AIRBNB
+2
+Objectif : 10+
+TERMINÉES
+—
+sur 25
+EN COURS
+—
+actives
+BLOQUÉES
+—
+à débloquer
+BUDGET RESTANT
+—
+sur 1 000 €
 
-<div class="intro">
-  <h2>Équipe Villa Dar Abdou,</h2>
-  <p>Vous avez devant vous une <strong>war room</strong>.</p>
-  <p>Une war room, c'est l'outil qu'utilisent les équipes militaires, les salles de crise et les startups en phase de lancement pour une seule raison : quand le temps manque et que chaque action compte, il faut que tout le monde voie exactement où on en est, qui fait quoi, et ce qui bloque.</p>
-  <p>On est dans cette situation. <strong>Zéro réservation. Juin dans 8 jours.</strong> Un produit excellent qui n'existe pas encore aux yeux des clients.</p>
-  <p>Cette war room, c'est notre tableau de bord commun pour les 45 prochains jours. Chaque tâche a un impact chiffré — ce n'est pas décoratif. <strong>Une barre rouge à 90% signifie que cette action génère directement des réservations.</strong> Une barre grise à 15% signifie que c'est utile, mais pas maintenant.</p>
-  <p style="margin-top:10px;font-weight:500;color:#1a1a18;">Voici comment ça fonctionne :</p>
-  <ul style="margin:6px 0 6px 18px;color:#5f5e5a;line-height:1.9;">
-    <li>Choisissez une tâche libre et tapez votre prénom dans le champ <strong>"Attribuer à…"</strong> puis cliquez OK — elle vous appartient, tout le monde le voit.</li>
-    <li>Cliquez sur le bouton de statut à droite de chaque tâche pour faire avancer : <strong>À faire → En cours → Bloquée → Terminée</strong>. L'avancement global se met à jour en temps réel pour toute l'équipe.</li>
-    <li>Lisez le <strong>"pourquoi"</strong> sous chaque tâche avant de commencer — pas pour faire joli, mais parce que comprendre l'objectif change la façon de l'exécuter.</li>
-  </ul>
-  <p><strong>Une seule règle :</strong> les tâches marquées <span style="background:#FCEBEB;color:#A32D2D;padding:1px 7px;border-radius:99px;font-size:11px;font-weight:500;">Urgent</span> passent avant tout le reste. Sans elles, le reste ne sert à rien.</p>
-  <p style="margin-top:8px;font-weight:500;color:#1a1a18;">On a 8 jours pour exister. Allons-y.</p>
-</div>
 
-<div class="stats">
-  <div class="stat"><div class="stat-label">Réservations</div><div class="stat-value" style="color:#A32D2D;">0</div><div class="stat-sub">Juin–août 2026</div></div>
-  <div class="stat"><div class="stat-label">Avis Airbnb</div><div class="stat-value" style="color:#A32D2D;">2</div><div class="stat-sub">Objectif : 10+</div></div>
-  <div class="stat"><div class="stat-label">Terminées</div><div class="stat-value" id="done-count">—</div><div class="stat-sub" id="done-sub">sur 25</div></div>
-  <div class="stat"><div class="stat-label">En cours</div><div class="stat-value" id="inprog-count" style="color:#854F0B;">—</div><div class="stat-sub">actives</div></div>
-  <div class="stat"><div class="stat-label">Bloquées</div><div class="stat-value" id="blocked-count" style="color:#A32D2D;">—</div><div class="stat-sub">à débloquer</div></div>
-  <div class="stat"><div class="stat-label">Budget restant</div><div class="stat-value" id="budget-left">—</div><div class="stat-sub">sur 1 000 €</div></div>
-</div>
 
-<div class="prog-wrap">
-  <div class="prog-track">
-    <div class="prog-seg" id="seg-done" style="width:0%;background:#639922;"></div>
-    <div class="prog-seg" id="seg-inprog" style="width:0%;background:#EF9F27;"></div>
-    <div class="prog-seg" id="seg-blocked" style="width:0%;background:#E24B4A;"></div>
-  </div>
-  <div class="prog-labels">
-    <div class="prog-leg"><div class="prog-leg-dot" style="background:#639922;"></div><span id="leg-done">0 terminée</span></div>
-    <div class="prog-leg"><div class="prog-leg-dot" style="background:#EF9F27;"></div><span id="leg-inprog">0 en cours</span></div>
-    <div class="prog-leg"><div class="prog-leg-dot" style="background:#E24B4A;"></div><span id="leg-blocked">0 bloquée</span></div>
-    <div class="prog-leg"><div class="prog-leg-dot" style="background:#b4b2a9;"></div><span id="leg-todo">25 à faire</span></div>
-  </div>
-</div>
 
-<div class="legend">
-  <span style="font-weight:500;color:#1a1a18;">Impact sur réservations :</span>
-  <div class="ld"><div class="ldot" style="background:#E24B4A;"></div>Critique — réservations directes</div>
-  <div class="ld"><div class="ldot" style="background:#EF9F27;"></div>Élevé — conversion/crédibilité</div>
-  <div class="ld"><div class="ldot" style="background:#97C459;"></div>Moyen — support</div>
-  <div class="ld"><div class="ldot" style="background:#b4b2a9;"></div>Faible — long terme</div>
-</div>
+0 terminée
 
-<div id="tasks-container"></div>
+0 en cours
 
-<div class="footer-note">
-  <strong>Ordre d'exécution strict :</strong> Airbnb (3 annonces, prix ajusté) → Groupes Facebook → WhatsApp Business → Booking.com → Shooting → Meta Ads (seulement après 8 avis).<br>
-  Instagram et TikTok sont en dernier — canal de crédibilité à 6 mois, pas d'acquisition à 8 jours.
-</div>
+0 bloquée
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+25 à faire
+Impact sur réservations :
 
-const firebaseConfig = {
-  apiKey: "AIzaSyC5bXiyfmpC_5TH_vJDoaiS8sSEZCk1Myo",
-  authDomain: "villa-abdou.firebaseapp.com",
-  databaseURL: "https://villa-abdou-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "villa-abdou",
-  storageBucket: "villa-abdou.firebasestorage.app",
-  messagingSenderId: "1020606413338",
-  appId: "1:1020606413338:web:d252772fcdaea9d377afa3"
-};
+Critique — réservations directes
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-const stateRef = ref(db, 'warroom/tasks');
+Élevé — conversion/crédibilité
 
-const STATUSES = ['todo','inprogress','blocked','done'];
-const STATUS_LABELS = {todo:'À faire',inprogress:'En cours',blocked:'Bloquée',done:'Terminée'};
-const STATUS_DOT = {todo:'sd-todo',inprogress:'sd-inprogress',blocked:'sd-blocked',done:'sd-done'};
+Moyen — support
 
-const TASKS = [
-  {phase:0,id:'p0_0a',title:'Ouvrir Airbnb et baisser le prix Duo à 900 €/sem — juin uniquement',why:'Tu achètes des avis, pas des revenus. Sans cette réduction, tu n\'apparais pas dans les résultats Airbnb filtrés par prix. 2 minutes ce soir.',imp:95,canal:'Airbnb',urgent:true,deadline:'Ce soir',budget:0},
-  {phase:0,id:'p0_0b',title:'Envoyer un message aux 2 clients Airbnb existants pour demander un avis détaillé',why:'"Votre retour nous aide énormément à nous lancer. Auriez-vous 2 minutes pour laisser un avis ?" 2 avis supplémentaires peuvent changer ta visibilité cette semaine.',imp:90,canal:'Airbnb',urgent:true,deadline:'Ce soir',budget:0},
-  {phase:0,id:'p0_0c',title:'Identifier et lister les 5 groupes Facebook cibles pour demain matin',why:'Chercher : "Tunisiens de France", "Vacances Tunisie été", "Location Djerba directe", "Djerba séjour famille". Noter les liens des 5 groupes avec le plus de membres actifs.',imp:82,canal:'Facebook',urgent:true,deadline:'Ce soir',budget:0},
-  {phase:0,id:'p0_1',title:'Créer 3 annonces Airbnb distinctes : Duo / Villa indépendante / Privatisation',why:'1 annonce = 1 chance d\'apparaître. 3 annonces = 3 fois plus de surface dans les résultats. Chaque offre a sa clientèle et son propre titre.',imp:90,canal:'Airbnb',urgent:true,deadline:'J+2',budget:0},
-  {phase:0,id:'p0_2',title:'Réécrire les 3 annonces : titre, description, politique piscine cristal claire',why:'La politique piscine floue = litige garanti. Chaque annonce doit répondre à "pour qui ?" et "qu\'est-ce que j\'ai exactement ?" en 3 secondes de lecture.',imp:88,canal:'Airbnb',urgent:true,deadline:'J+2',budget:0},
-  {phase:0,id:'p0_3',title:'Configurer WhatsApp Business avec réponse automatique',why:'La vitesse de réponse = chiffre d\'affaires. Un prospect sans réponse en 10 min contacte 8 autres villas. La réponse auto achète ce temps.',imp:85,canal:'WhatsApp',urgent:true,deadline:'J+1',budget:0},
-  {phase:0,id:'p0_4',title:'Publier dans les 5 groupes Facebook diaspora tunisienne identifiés',why:'50k à 200k membres par groupe, intention vacances active. Coût zéro, résultat potentiel en 48h. Canal d\'acquisition le plus rapide maintenant.',imp:82,canal:'Facebook',urgent:true,deadline:'J+2',budget:0},
-  {phase:0,id:'p0_5',title:'Ouvrir compte Booking.com et synchroniser le calendrier',why:'Booking capte une clientèle européenne différente, filtre moins sur les avis. Le calendrier synchronisé évite les doubles réservations.',imp:78,canal:'Booking',urgent:false,deadline:'J+3',budget:0},
-  {phase:0,id:'p0_6',title:'Relancer les 2 clients Airbnb si pas de réponse à J+2',why:'Relance polie si pas de réponse au premier message. 4 avis au lieu de 2 changent la perception immédiatement.',imp:75,canal:'Airbnb',urgent:false,deadline:'J+3',budget:0},
-  {phase:0,id:'p0_7',title:'Remonter le prix Duo à 1 400 €/semaine dès 8 avis obtenus',why:'La réduction à 900€ est temporaire et stratégique. Dès la crédibilité construite, le prix de marché s\'applique. Ne pas oublier — c\'est de l\'argent perdu sinon.',imp:80,canal:'Airbnb',urgent:false,deadline:'Dès 8 avis',budget:0},
-  {phase:1,id:'p1_1',title:'Shooting photo/vidéo pro — piscine jour + nuit, intérieurs, terrasses',why:'Fondation de tout le reste : annonces, Instagram, brochure mariage, Ads. Sans photos premium, tout convertit à moitié.',imp:85,canal:'Contenu',urgent:false,deadline:'J+7',budget:0,gratuit:true},
-  {phase:1,id:'p1_2',title:'Créer pipeline leads Google Sheets',why:'Colonnes : Nom · Type · Dates · Budget · Source · Statut · Dernier contact. Un lead mariage vaut 3 000 à 5 000€. Le perdre par oubli = perte directe.',imp:72,canal:'CRM',urgent:false,deadline:'J+7',budget:0},
-  {phase:1,id:'p1_3',title:'Modifier la pancarte et envoyer à l\'imprimeur',why:'Supprimer le QR code de la bande gauche, agrandir le numéro WhatsApp. La pancarte doit convertir les passants à 60 km/h.',imp:70,canal:'Pancarte',urgent:false,deadline:'J+7',budget:150},
-  {phase:1,id:'p1_4',title:'Créer Google Business Profile "Villa Dar Abdou Djerba"',why:'Indexation locale gratuite. Les prospects googlient "villa Djerba mariage" avant de réserver. Fiche bien remplie = visibilité sans payer.',imp:60,canal:'Google',urgent:false,deadline:'J+10',budget:0},
-  {phase:1,id:'p1_5',title:'Contacter 10 wedding planners tunisiens (Instagram DM + email)',why:'Un seul partenariat = 5 à 10 mariages/an. ROI potentiel immense. Message court : "Nous accueillons jusqu\'à 300 invités, piscine, 3000m². Partenariat possible ?"',imp:78,canal:'Mariage',urgent:false,deadline:'J+14',budget:0},
-  {phase:1,id:'p1_6',title:'Créer brochure PDF mariages/événements (1 page A4)',why:'Capacité 300 invités · piscine · tarifs · photos · contact. À envoyer en 30 secondes sur WhatsApp à chaque lead mariage.',imp:65,canal:'Mariage',urgent:false,deadline:'J+10',budget:0},
-  {phase:1,id:'p1_7',title:'Publication quotidienne groupes Facebook (1 post/jour, textes variés)',why:'Maintenir la présence après le lancement. Varier : famille, couple, mariage, disponibilités urgentes. Répliquer le post qui génère le plus de messages.',imp:75,canal:'Facebook',urgent:false,deadline:'Quotidien',budget:0},
-  {phase:2,id:'p2_1',title:'Lancer Meta Ads vers WhatsApp direct (FR, BE, CH — 35-55 ans, famille)',why:'Seulement après shooting ET 8 avis. Avant = gaspillage garanti. Lien WhatsApp direct convertit mieux qu\'un site. 10€/jour pendant 30 jours.',imp:80,canal:'Ads',urgent:false,deadline:'J+22',budget:300},
-  {phase:2,id:'p2_2',title:'Ouvrir Abritel/VRBO et synchroniser le calendrier',why:'Troisième plateforme = troisième surface de visibilité. Abritel capte les familles françaises qui préfèrent les plateformes françaises à Airbnb.',imp:50,canal:'Abritel',urgent:false,deadline:'J+25',budget:0},
-  {phase:2,id:'p2_3',title:'Inviter 2 micro-influenceurs famille/voyage Tunisie (séjour contre contenu)',why:'Comptes 5k-30k abonnés : meilleur engagement que les gros. Vérifier audience francophone. Retour potentiel : 30k-80k vues organiques.',imp:55,canal:'Influence',urgent:false,deadline:'J+25',budget:50},
-  {phase:2,id:'p2_4',title:'Lancer Instagram — profil pro avec photos du shooting',why:'Rôle précis : rassurer le prospect qui te cherche après la pancarte ou une annonce. Preuve sociale visuelle, pas canal d\'acquisition.',imp:25,canal:'Instagram',urgent:false,deadline:'J+21',budget:0},
-  {phase:2,id:'p2_5',title:'Publication Reels — 1 vidéo par semaine (piscine, ambiance, famille)',why:'Sans audience, le reach organique sera faible. Pertinent à 6 mois, pas maintenant. Traiter comme un bonus, pas une priorité.',imp:15,canal:'Instagram',urgent:false,deadline:'Hebdo',budget:0},
-  {phase:2,id:'p2_6',title:'Bilan J+30 : couper ce qui ne convertit pas, doubler ce qui fonctionne',why:'Quels canaux ont généré des leads réels ? Coût par lead ? Ce bilan détermine la stratégie de l\'été. Sans lui, tu investis à l\'aveugle.',imp:85,canal:'Pilotage',urgent:false,deadline:'J+30',budget:0},
-  {phase:2,id:'p2_7',title:'Répondre à tous les leads en moins de 10 minutes',why:'Permanent. La vitesse de réponse est ton avantage concurrentiel réel. Chaque heure de délai = taux de conversion qui baisse.',imp:90,canal:'WhatsApp',urgent:false,deadline:'Permanent',budget:0},
-  {phase:2,id:'p2_8',title:'Collecte systématique d\'avis après chaque séjour',why:'Relance J+1 après départ : "Merci pour votre séjour, votre avis sur Airbnb nous aide énormément." Objectif : 20 avis avant fin août.',imp:80,canal:'Airbnb',urgent:false,deadline:'Permanent',budget:0},
-];
+Faible — long terme
 
-const PHASES=[
-  {id:0,badge:'Phase 0 — Survie',cls:'b-red',title:'Cette semaine — J+1 à J+7',dates:'Objectif : premières demandes reçues',note:'Les 3 premières tâches se font ce soir. Les suivantes se distribuent dès demain matin.'},
-  {id:1,badge:'Phase 1 — Crédibilité',cls:'b-amber',title:'J+7 à J+21',dates:'Objectif : 8+ avis, 3 canaux actifs',note:''},
-  {id:2,badge:'Phase 2 — Amplification',cls:'b-green',title:'J+21 à J+45',dates:'Objectif : 20+ leads qualifiés, 60%+ occupation',note:''},
-];
-
-let state = {};
-
-function impClass(v){return v>=80?'ih':v>=55?'im':v>=25?'il':'imin';}
-function canalTag(c){const m={Airbnb:'tc',Booking:'tc',Facebook:'tc',WhatsApp:'tc',Instagram:'tc',Abritel:'tc',Ads:'tu',Mariage:'tm',Contenu:'tm',CRM:'tm',Google:'tm',Pancarte:'tm',Influence:'tm',Pilotage:'tm'};return`<span class="tag ${m[c]||'tc'}">${c}</span>`;}
-function nextStatus(cur){const i=STATUSES.indexOf(cur||'todo');return STATUSES[(i+1)%STATUSES.length];}
-
-function buildUI(){
-  const container=document.getElementById('tasks-container');
-  container.innerHTML='';
-  PHASES.forEach(ph=>{
-    const tasks=TASKS.filter(t=>t.phase===ph.id);
-    const div=document.createElement('div');
-    div.className='phase';
-    div.innerHTML=`
-      <div class="phase-hd">
-        <span class="badge ${ph.cls}">${ph.badge}</span>
-        <span class="phase-title">${ph.title}</span>
-        <span class="phase-dates">${ph.dates}</span>
-      </div>
-      ${ph.note?`<div class="note">${ph.note}</div>`:''}
-      <div class="tasks" id="phase-${ph.id}"></div>
-    `;
-    container.appendChild(div);
-    const list=div.querySelector(`#phase-${ph.id}`);
-    tasks.forEach(t=>{
-      const el=document.createElement('div');
-      el.className='task';
-      el.id='task-'+t.id;
-      const budgetStr=t.gratuit?'<span class="budget" style="color:#3B6D11;">0 € (offert)</span>':t.budget>0?`<span class="budget">${t.budget} €</span>`:'<span class="budget bz">0 €</span>';
-      el.innerHTML=`
-        <div class="task-body">
-          <div class="task-top">
-            <span class="task-title">${t.title}</span>
-            ${canalTag(t.canal)}
-            ${t.urgent?'<span class="tag tu">Urgent</span>':''}
-          </div>
-          <div class="task-why">${t.why}</div>
-          <div class="task-footer">
-            <div class="imp ${impClass(t.imp)}">
-              <span class="imp-label">Impact</span>
-              <div class="bar-t"><div class="bar-f" style="width:${t.imp}%"></div></div>
-              <span class="imp-pct">${t.imp}%</span>
-            </div>
-            <div class="meta-row">
-              <span class="deadline"><strong>${t.deadline}</strong></span>
-              ${budgetStr}
-            </div>
-          </div>
-          <div class="resp-wrap">
-            <input class="resp-input" id="resp-${t.id}" placeholder="Attribuer à…" onkeydown="if(event.key==='Enter')window.saveResp('${t.id}')">
-            <button class="save-btn" onclick="window.saveResp('${t.id}')">OK</button>
-            <span class="resp-display" id="rd-${t.id}" style="display:none;"></span>
-            <button class="edit-btn" id="edit-${t.id}" style="display:none;" onclick="window.editResp('${t.id}')">✎</button>
-          </div>
-        </div>
-        <div class="task-right">
-          <button class="status-btn" id="sb-${t.id}" onclick="window.cycleStatus('${t.id}')">
-            <div class="status-dot sd-todo" id="sdot-${t.id}"></div>
-            <span id="slabel-${t.id}">À faire</span>
-          </button>
-          <div class="status-hint">cliquer pour changer</div>
-        </div>
-      `;
-      list.appendChild(el);
-    });
-  });
-}
-
-function applyState(){
-  let done=0,inprog=0,blocked=0,todo=0,budgetSpent=0;
-  const total=TASKS.length;
-  TASKS.forEach(t=>{
-    const s=state[t.id]||{};
-    const status=s.status||'todo';
-    const el=document.getElementById('task-'+t.id);
-    const sdot=document.getElementById('sdot-'+t.id);
-    const slabel=document.getElementById('slabel-'+t.id);
-    const rd=document.getElementById('rd-'+t.id);
-    const ri=document.getElementById('resp-'+t.id);
-    const editBtn=document.getElementById('edit-'+t.id);
-    if(el){el.className='task';if(status==='done')el.classList.add('st-done');if(status==='blocked')el.classList.add('st-blocked');if(status==='inprogress')el.classList.add('st-inprogress');}
-    if(sdot)sdot.className='status-dot '+STATUS_DOT[status];
-    if(slabel)slabel.textContent=STATUS_LABELS[status];
-    if(status==='done'){done++;if(t.budget)budgetSpent+=t.budget;}
-    else if(status==='inprogress')inprog++;
-    else if(status==='blocked')blocked++;
-    else todo++;
-    if(rd&&ri&&editBtn){
-      if(s.resp){rd.textContent=s.resp;rd.style.display='inline-block';ri.style.display='none';editBtn.style.display='inline-block';}
-      else{rd.style.display='none';ri.style.display='inline-block';editBtn.style.display='none';}
-    }
-  });
-  const pctDone=done/total*100;
-  const pctInprog=inprog/total*100;
-  const pctBlocked=blocked/total*100;
-  document.getElementById('seg-done').style.width=pctDone+'%';
-  document.getElementById('seg-inprog').style.width=pctInprog+'%';
-  document.getElementById('seg-blocked').style.width=pctBlocked+'%';
-  const globalScore=Math.round((done+(inprog*0.5))/total*100);
-  document.getElementById('global-pct').textContent=globalScore+'%';
-  document.getElementById('done-count').textContent=done;
-  document.getElementById('done-sub').textContent='sur '+total;
-  document.getElementById('inprog-count').textContent=inprog;
-  document.getElementById('blocked-count').textContent=blocked;
-  document.getElementById('budget-left').textContent=(1000-budgetSpent)+'€';
-  document.getElementById('leg-done').textContent=done+' terminée'+(done>1?'s':'');
-  document.getElementById('leg-inprog').textContent=inprog+' en cours';
-  document.getElementById('leg-blocked').textContent=blocked+' bloquée'+(blocked>1?'s':'');
-  document.getElementById('leg-todo').textContent=todo+' à faire';
-}
-
-function setSyncStatus(s,label){
-  const dot=document.getElementById('sync-dot');
-  const lbl=document.getElementById('sync-label');
-  dot.className='dot'+(s==='syncing'?' syncing':s==='err'?' err':'');
-  lbl.textContent=label;
-  if(s==='ok')document.getElementById('last-sync').textContent='Mis à jour à '+(new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}));
-}
-
-window.cycleStatus = async function(id){
-  const cur=(state[id]||{}).status||'todo';
-  const next=nextStatus(cur);
-  const updates={};
-  updates[id+'/status']=next;
-  setSyncStatus('syncing','Enregistrement…');
-  try{
-    await update(stateRef,updates);
-  }catch(e){setSyncStatus('err','Erreur — vérifier la connexion');}
-};
-
-window.saveResp = async function(id){
-  const val=document.getElementById('resp-'+id).value.trim();
-  if(!val)return;
-  const updates={};
-  updates[id+'/resp']=val;
-  setSyncStatus('syncing','Enregistrement…');
-  try{
-    await update(stateRef,updates);
-  }catch(e){setSyncStatus('err','Erreur — vérifier la connexion');}
-};
-
-window.editResp = function(id){
-  const rd=document.getElementById('rd-'+id);
-  const ri=document.getElementById('resp-'+id);
-  const editBtn=document.getElementById('edit-'+id);
-  rd.style.display='none';
-  ri.style.display='inline-block';
-  ri.value=rd.textContent;
-  editBtn.style.display='none';
-  ri.focus();
-};
-
-buildUI();
-setSyncStatus('syncing','Connexion à la base de données…');
-
-onValue(stateRef, (snapshot)=>{
-  state = snapshot.val() || {};
-  applyState();
-  setSyncStatus('ok','Synchronisé');
-}, (error)=>{
-  setSyncStatus('err','Erreur de connexion — vérifier Firebase');
-});
-</script>
-</body>
-</html>
+Ordre d'exécution strict : Airbnb (3 annonces, prix ajusté) → Groupes Facebook → WhatsApp Business → Booking.com → Shooting → Meta Ads (seulement après 8 avis).
+Instagram et TikTok sont en dernier — canal de crédibilité à 6 mois, pas d'acquisition à 8 jours.
